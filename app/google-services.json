@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "461742653137",
+    "project_id": "shamirsecretsharing-a63d0",
+    "storage_bucket": "shamirsecretsharing-a63d0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:461742653137:android:f016ddf7b373a1f868cff0",
+        "android_client_info": {
+          "package_name": "com.codingstudio.shamirsecretsharing"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "461742653137-pbus9o02n49ccb7pvbgset88bim2jvgn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgO1HG8b4EtOHLdlaBeFWY0YNQ8XOuPL4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "461742653137-pbus9o02n49ccb7pvbgset88bim2jvgn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
