@@ -4,13 +4,11 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import com.codingstudio.shamirsecretsharing.R
 import com.codingstudio.shamirsecretsharing.model.Resource
 import com.codingstudio.shamirsecretsharing.model.User
@@ -18,23 +16,33 @@ import com.codingstudio.shamirsecretsharing.secretSharing.Scheme
 import com.codingstudio.shamirsecretsharing.ui.activity.mqtt.MQTTClient
 import com.codingstudio.shamirsecretsharing.ui.viewmodel.SecretSharingViewModel
 import com.codingstudio.shamirsecretsharing.utils.Constant
+import com.codingstudio.shamirsecretsharing.utils.SharedPref
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_admin.*
+import kotlinx.android.synthetic.main.activity_admin.imageViewLogout
+import kotlinx.android.synthetic.main.activity_admin.relativeLayoutParent
+import kotlinx.android.synthetic.main.activity_admin.relativeLayoutProgressBar
+import kotlinx.android.synthetic.main.activity_user.*
 import okio.internal.commonAsUtf8ToByteArray
 import org.eclipse.paho.client.mqttv3.*
-import java.nio.charset.StandardCharsets
 import java.security.SecureRandom
 
 
 class AdminActivity : AppCompatActivity() {
 
-    private val TAG = "UserActivity"
+    private val TAG = "AdminActivity"
     private lateinit var viewModel: SecretSharingViewModel
     private var userUniqueId: String = ""
     private var user : User ?= null
+    private var userList : List<User> ?= null
     private lateinit var mqttClient : MQTTClient
 
+    private var userId = ""
+    private var deviceName = ""
+
+    private var messageNoOfUser = ""
+    private var noOfUser = 0
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,51 +51,88 @@ class AdminActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this).get(SecretSharingViewModel::class.java)
 
+
         textViewAdminProceed.setOnClickListener {
 
-            val scheme = Scheme(SecureRandom(), 2, 2)
-            val secret: ByteArray = "hello there".commonAsUtf8ToByteArray()
-            val parts = scheme.split(secret)
+            if (noOfUser > 0) {
 
-            val keyArr = ArrayList<String>()
+                val scheme = Scheme(SecureRandom(), noOfUser, noOfUser)
+                val secret: ByteArray = deviceName.commonAsUtf8ToByteArray()
+                val parts = scheme.split(secret)
 
-            for (item in parts) {
-                keyArr.add(item.value.toString())
+                val keyArr = ArrayList<String>()
+
+                for (item in parts) {
+                    keyArr.add(item.value.toString())
+                }
+
+                val gson = Gson()
+                val keys = gson.toJson(keyArr)
+
+                //proceedApiCall(keys)
+
+                var keysStr = ""
+                keyArr.forEachIndexed { index, key ->
+
+                    if (index != noOfUser - 1) {
+                        keysStr = "$keysStr$key,"
+                    } else {
+                        keysStr = "$keysStr$key"
+                    }
+                }
+
+                //publishMessageToMqtt("${keyArr[0]},${keyArr[1]},${keyArr[2]}")
+                //publishMessageToMqtt2("${keyArr[0]},${keyArr[1]},${keyArr[2]}")
+                publishMessageToMqtt(keysStr)
+                publishMessageToMqtt2(keysStr)
+
+            } else {
+                Snackbar.make(relativeLayoutParent, "No User Found. Please register user.", Snackbar.LENGTH_LONG).show()
             }
-
-            val gson = Gson()
-            val keys = gson.toJson(keyArr)
-
-            proceedApiCall(keys)
-
-            publishMessageToMqtt("${keyArr[0]},${keyArr[1]}")
-
         }
 
-        getUserRequestInfo()
+        checkAdminInfo()
         observe()
         mqttConnection()
 
+        imageViewLogout.setOnClickListener {
+
+            SharedPref().logoutUser(this)
+            finish()
+        }
+
+        btnSave.setOnClickListener {
+            proceedApiCall()
+        }
+
     }
 
-    private fun proceedApiCall(keys : String) {
+    private fun proceedApiCall() {
 
-        viewModel.adminProcessed(
-            device_id = user?.fk_user_device_id ?: "",
-            hash_keys = keys
-        )
+        if (editTextNoOfUser.text.toString().trim().isNullOrEmpty() || editTextPercentage.text.toString().trim().isNullOrEmpty()) {
 
+            Snackbar.make(relativeLayoutParent, "Fill all the fields", Snackbar.LENGTH_LONG).show()
+        } else {
+
+            messageNoOfUser = "Lower Bound : ${editTextNoOfUser.text.toString().trim()} \nPercentage of dynamic user for threshold : ${editTextPercentage.text.toString().trim()}"
+
+            viewModel.adminSetUserNo(
+                user_no = editTextNoOfUser.text.toString().trim(),
+                percentage = editTextPercentage.text.toString().trim()
+            )
+        }
     }
 
-    private fun getUserRequestInfo() {
+    private fun checkAdminInfo() {
 
-        viewModel.checkUserRequestForAdmin()
+        viewModel.checkAdminInfo()
+        viewModel.getAllUser()
 
     }
 
     private fun observe() {
 
-        viewModel.userRequestAdmin.observe(this, Observer { res ->
+        viewModel.adminInfo.observe(this, Observer { res ->
             res.getContentIfNotHandled()?.let { response ->
 
                 when (response) {
@@ -97,19 +142,13 @@ class AdminActivity : AppCompatActivity() {
 
                             if (userResponseInsertion.status == 200) {
 
-                                user = userResponseInsertion.data[0]
+                                val adminInfo = userResponseInsertion.data
+                                messageNoOfUser = "Lower Bound : ${adminInfo.no_of_user} \nPercentage of dynamic user for threshold : ${adminInfo.percentage}"
 
-                                textViewAdminMessage.visibility = View.VISIBLE
+                                linearLayoutNoOfUserAdmin.visibility = View.GONE
+                                linearLayoutAdminActions.visibility = View.VISIBLE
+                                textViewAdminMessageNoOfUser.text = messageNoOfUser
 
-                                if (user?.is_processed == "0") {
-
-                                    textViewAdminProceed.visibility = View.VISIBLE
-                                    textViewAdminMessage.text = "There is one request from user. Kindly press proceed button to generate key and circulate to another users (2 user)."
-
-                                } else {
-                                    textViewAdminProceed.visibility = View.GONE
-                                    textViewAdminMessage.text = "Key generated successfully and sent to the users."
-                                }
                             }
                         }
                     }
@@ -144,7 +183,7 @@ class AdminActivity : AppCompatActivity() {
             }
         })
 
-        viewModel.adminProcessed.observe(this, Observer { res ->
+        viewModel.getAllUser.observe(this, Observer { res ->
             res.getContentIfNotHandled()?.let { response ->
 
                 when (response) {
@@ -154,9 +193,56 @@ class AdminActivity : AppCompatActivity() {
 
                             if (userResponseInsertion.status == 200) {
 
-                                textViewAdminProceed.visibility = View.GONE
-                                textViewAdminMessage.visibility = View.VISIBLE
-                                textViewAdminMessage.text = "Key generated successfully and sent to the users."
+                                userList = userResponseInsertion.data
+                                noOfUser = userResponseInsertion.data.size - 1
+
+                            }
+                        }
+                    }
+                    is Resource.Error -> {
+                        relativeLayoutProgressBar.visibility = View.GONE
+                        response.message?.let { errorMessage ->
+                            Log.e(TAG, "An Error Occurred : $errorMessage")
+                            when (errorMessage) {
+
+                                Constant.NO_INTERNET -> {
+                                    Snackbar.make(
+                                        relativeLayoutParent,
+                                        "No internet connection",
+                                        Snackbar.LENGTH_LONG
+                                    ).show()
+                                }
+                                Constant.CONFLICT -> {
+                                    //Snackbar.make(relativeLayoutParent, "Something went wrong. Please try again", Snackbar.LENGTH_LONG).show()
+                                }
+                                else -> {
+                                    //Snackbar.make(relativeLayoutParent, "Something went wrong. Please try again", Snackbar.LENGTH_LONG).show()
+                                }
+                            }
+                        }
+                    }
+                    is Resource.Loading -> {
+                        relativeLayoutProgressBar.visibility = View.VISIBLE
+                    }
+
+                }
+
+            }
+        })
+
+        viewModel.adminUserNo.observe(this, Observer { res ->
+            res.getContentIfNotHandled()?.let { response ->
+
+                when (response) {
+                    is Resource.Success -> {
+                        relativeLayoutProgressBar.visibility = View.GONE
+                        response.data?.let { userResponseInsertion ->
+
+                            if (userResponseInsertion.status == 200) {
+
+                                linearLayoutNoOfUserAdmin.visibility = View.GONE
+                                linearLayoutAdminActions.visibility = View.VISIBLE
+                                textViewAdminMessageNoOfUser.text = messageNoOfUser
                             }
                         }
                     }
@@ -190,7 +276,6 @@ class AdminActivity : AppCompatActivity() {
 
             }
         })
-
 
     }
 
@@ -209,16 +294,16 @@ class AdminActivity : AppCompatActivity() {
             pwd,
             object : IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
-                    Log.d(this.javaClass.name, "Connection success")
+                    Log.d(TAG, "Connection success")
 
                     Toast.makeText(this@AdminActivity, "MQTT Connection success", Toast.LENGTH_SHORT).show()
 
-                    //publishMessageToMqtt(keys)
+                    subscribeAdmin()
 
                 }
 
                 override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                    Log.d(this.javaClass.name, "Connection failure: ${exception.toString()}")
+                    Log.d(TAG, "Connection failure: ${exception.toString()}")
 
                     Toast.makeText(this@AdminActivity, "MQTT Connection fails: ${exception.toString()}", Toast.LENGTH_SHORT).show()
 
@@ -229,17 +314,34 @@ class AdminActivity : AppCompatActivity() {
             object : MqttCallback {
                 override fun messageArrived(topic: String?, message: MqttMessage?) {
                     val msg = "Receive message: ${message.toString()} from topic: $topic"
-                    Log.d(this.javaClass.name, msg)
+                    Log.d(TAG, msg)
+                    //Toast.makeText(this@AdminActivity, msg, Toast.LENGTH_SHORT).show()
 
-                    Toast.makeText(this@AdminActivity, msg, Toast.LENGTH_SHORT).show()
+                    val request = message.toString().split(",")
+
+                    if (topic == "admin" && request[0] == "user_request") {
+
+                        try {
+                            userId = request[1]
+                            deviceName = request[2]
+
+                            textViewAdminProceed.visibility = View.VISIBLE
+                            textViewAdminMessage.text = "There is one request from $userId for the device $deviceName.\n\nKindly press proceed button to generate key and circulate to another users."
+
+                        } catch (e: Exception){
+                            Toast.makeText(this@AdminActivity, "Invalid request. Please try again", Toast.LENGTH_LONG).show()
+                        }
+
+                    }
+
                 }
 
                 override fun connectionLost(cause: Throwable?) {
-                    Log.d(this.javaClass.name, "Connection lost ${cause.toString()}")
+                    Log.d(TAG, "Connection lost ${cause.toString()}")
                 }
 
                 override fun deliveryComplete(token: IMqttDeliveryToken?) {
-                    Log.d(this.javaClass.name, "Delivery complete")
+                    Log.d(TAG, "Delivery complete")
                 }
             })
 
@@ -247,7 +349,40 @@ class AdminActivity : AppCompatActivity() {
 
     private fun publishMessageToMqtt(keys : String) {
 
-        val topic   = "led"
+        val topic   = "user"
+        val message = "key_generated,$keys,$userId,$deviceName"
+
+        if (mqttClient.isConnected()) {
+            mqttClient.publish(topic,
+                message,
+                1,
+                false,
+                object : IMqttActionListener {
+                    override fun onSuccess(asyncActionToken: IMqttToken?) {
+                        val msg ="Publish message: $message to topic: $topic"
+                        Log.d(this.javaClass.name, msg)
+
+                        Toast.makeText(this@AdminActivity, msg, Toast.LENGTH_SHORT).show()
+
+                        SharedPref().setString(this@AdminActivity, Constant.ADMIN_STATUS, Constant.ADMIN_STATUS_2)
+                        textViewAdminProceed.visibility = View.GONE
+                        textViewAdminMessage.text = "Key generated successfully and sent to the users."
+
+                    }
+
+                    override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+                        Log.d(this.javaClass.name, "Failed to publish message to topic")
+                    }
+                })
+        } else {
+            Log.d(this.javaClass.name, "Impossible to publish, no server connected")
+        }
+
+    }
+
+    private fun publishMessageToMqtt2(keys : String) {
+
+        val topic   = "device"
         val message = "admin,$keys"
 
         if (mqttClient.isConnected()) {
@@ -261,6 +396,11 @@ class AdminActivity : AppCompatActivity() {
                         Log.d(this.javaClass.name, msg)
 
                         Toast.makeText(this@AdminActivity, msg, Toast.LENGTH_SHORT).show()
+
+                        SharedPref().setString(this@AdminActivity, Constant.ADMIN_STATUS, Constant.ADMIN_STATUS_2)
+                        textViewAdminProceed.visibility = View.GONE
+                        textViewAdminMessage.text = "Key generated successfully and sent to the users."
+
                     }
 
                     override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
@@ -294,6 +434,31 @@ class AdminActivity : AppCompatActivity() {
             })
         } else {
             Log.d(this.javaClass.name, "Impossible to disconnect, no server connected")
+        }
+
+    }
+
+    private fun subscribeAdmin() {
+
+        val topic = "admin"
+
+        if (mqttClient.isConnected()) {
+            mqttClient.subscribe(topic,
+                1,
+                object : IMqttActionListener {
+                    override fun onSuccess(asyncActionToken: IMqttToken?) {
+                        val msg = "Subscribed to: $topic"
+                        Log.d(TAG, msg)
+
+                        Toast.makeText(this@AdminActivity, msg, Toast.LENGTH_SHORT).show()
+                    }
+
+                    override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+                        Log.d(TAG, "Failed to subscribe: $topic")
+                    }
+                })
+        } else {
+            Log.d(TAG, "Impossible to subscribe, no server connected")
         }
 
     }

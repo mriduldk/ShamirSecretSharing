@@ -20,12 +20,12 @@
             app:title="Dashboard" />
 
         <ImageView
-            android:id="@+id/imageViewNotification"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:id="@+id/imageViewLogout"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
             android:layout_alignParentEnd="true"
             android:layout_margin="16dp"
-            android:src="@drawable/ic_baseline_notifications_none_24" />
+            android:src="@drawable/shutdown" />
 
         <View
             android:layout_width="match_parent"
@@ -51,7 +51,16 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <LinearLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:listitem="@layout/layout_user_list"
+                tools:itemCount="3"
+                android:orientation="vertical"/>
+
+            <!--<LinearLayout
+                android:id="@+id/linearLayoutUser1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
@@ -61,6 +70,7 @@
                 android:paddingVertical="16dp">
 
                 <TextView
+                    android:id="@+id/textViewUser1Name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
@@ -110,7 +120,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="16dp"
                         android:background="@drawable/bg"
-                        android:backgroundTint="@color/green"
                         android:paddingHorizontal="10dp"
                         android:paddingVertical="5dp"
                         android:text="Request"
@@ -125,6 +134,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/linearLayoutUser2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
@@ -135,6 +145,7 @@
                 android:paddingVertical="16dp">
 
                 <TextView
+                    android:id="@+id/textViewUser2Name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
@@ -184,7 +195,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="16dp"
                         android:background="@drawable/bg"
-                        android:backgroundTint="@color/green"
                         android:paddingHorizontal="10dp"
                         android:paddingVertical="5dp"
                         android:text="Request"
@@ -198,82 +208,194 @@
 
             </LinearLayout>
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:orientation="vertical">
-
-            <!--<TextView
-                android:id="@+id/textViewRequestText"
+            <LinearLayout
+                android:id="@+id/linearLayoutUser3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="30dp"
-                android:paddingHorizontal="30dp"
-                android:text="A request has been sent. Waiting for response from all users."
-                android:textAlignment="center"
-                android:textColor="@color/textColor"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:visibility="gone" />-->
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg"
+                android:backgroundTint="@color/divider"
+                android:orientation="horizontal"
+                android:paddingVertical="16dp">
 
-            <!--<TextView
-                android:id="@+id/textViewUserResponse1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:paddingHorizontal="30dp"
-                android:text="User 1 has confirmed your request."
-                android:textAlignment="center"
-                android:textColor="@color/green"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:visibility="gone" />-->
+                <TextView
+                    android:id="@+id/textViewUser3Name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:paddingHorizontal="30dp"
+                    android:text="USER 3"
+                    android:textColor="@color/green"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
-            <!--<TextView
-                android:id="@+id/textViewUserResponse2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="30dp"
-                android:paddingHorizontal="30dp"
-                android:text="User 2 has confirmed your request."
-                android:textAlignment="center"
-                android:textColor="@color/green"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:visibility="gone" />-->
+                <LinearLayout
+                    android:id="@+id/linearLayoutUserStatus3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:visibility="gone">
 
-            <!--
+                    <ImageView
+                        android:id="@+id/imageViewUserResponse3"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:layout_gravity="center_vertical"
+                        android:src="@drawable/circle"
+                        app:tint="@color/red" />
+
                     <TextView
-                        android:id="@+id/textViewRequestBtn"
-                        android:layout_width="match_parent"
+                        android:id="@+id/textViewUserResponse3"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="16dp"
-                        android:layout_marginBottom="60dp"
-                        android:background="@drawable/textview_bg"
-                        android:gravity="center"
-                        android:paddingVertical="16dp"
-                        android:text="Request for Access"
+                        android:paddingHorizontal="10dp"
+                        android:text="Not Confirmed"
+                        android:textAlignment="center"
+                        android:textColor="@color/red"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/linearLayoutUserRequest3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end">
+
+                    <TextView
+                        android:id="@+id/textViewRequestUser3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:background="@drawable/bg"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="5dp"
+                        android:text="Request"
+                        android:textAlignment="center"
                         android:textColor="@color/white"
                         android:textSize="18sp"
                         android:textStyle="bold" />
-            -->
+
+                </LinearLayout>
 
 
-            <!--  <TextView
-                  android:id="@+id/textViewSendToDevice"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:layout_margin="16dp"
-                  android:background="@drawable/textview_bg"
-                  android:gravity="center"
-                  android:paddingVertical="16dp"
-                  android:text="Send to Device"
-                  android:textColor="@color/white"
-                  android:textSize="18sp"
-                  android:textStyle="bold" />-->
+            </LinearLayout>-->
+
+            <LinearLayout
+                android:id="@+id/linearLayoutIntensity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="60dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/textViewMinusIntensity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/divider"
+                    android:clickable="true"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    android:padding="16dp"
+                    android:src="@drawable/ic_baseline_remove_24" />
+
+                <TextView
+                    android:id="@+id/textViewValueIntensity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:gravity="center"
+                    android:paddingVertical="16dp"
+                    android:textColor="@color/textColor"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:text="1.0" />
+
+                <ImageView
+                    android:id="@+id/textViewAddIntensity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/divider"
+                    android:clickable="true"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    android:padding="16dp"
+                    android:src="@drawable/ic_baseline_add_24" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayoutTemperature"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:gravity="center"
+                    android:paddingVertical="16dp"
+                    android:textColor="@color/textColor"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:text="Temperature &amp; Humidity : "
+                    android:visibility="gone"/>
+
+                <TextView
+                    android:id="@+id/textViewTemperature"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingVertical="16dp"
+                    android:textColor="@color/textColor"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    tools:text="45" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textViewTurnOff"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="100dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/textview_bg"
+                android:gravity="center"
+                android:paddingVertical="16dp"
+                android:text="Turn Off"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayoutAdminResponse"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                android:paddingHorizontal="30dp"
+                android:text="A request has been sent. Waiting for response from Admin."
+                android:textAlignment="center"
+                android:textColor="@color/textColor"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
 
         </LinearLayout>
 
@@ -346,7 +468,7 @@
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:layout_centerHorizontal="true"
-                        android:src="@drawable/bulb"
+                        android:src="@drawable/sensor"
                         app:tint="@color/blueDark" />
 
                     <TextView
@@ -355,7 +477,7 @@
                         android:layout_below="@id/imageViewBulb"
                         android:layout_centerHorizontal="true"
                         android:layout_marginTop="16dp"
-                        android:text="Light a Bulb"
+                        android:text="Industrial Sensor"
                         android:textColor="@color/white"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -363,6 +485,7 @@
                 </RelativeLayout>
 
                 <RelativeLayout
+                    android:id="@+id/relativeLayoutAC"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
@@ -377,7 +500,7 @@
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:layout_centerHorizontal="true"
-                        android:src="@drawable/ac"
+                        android:src="@drawable/thermometer"
                         app:tint="@color/orangeDark" />
 
                     <TextView
@@ -386,7 +509,7 @@
                         android:layout_below="@id/imageViewAc"
                         android:layout_centerHorizontal="true"
                         android:layout_marginTop="16dp"
-                        android:text="Start AC"
+                        android:text="Temperature Sensor"
                         android:textColor="@color/white"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -402,6 +525,7 @@
                 android:weightSum="2">
 
                 <RelativeLayout
+                    android:id="@+id/relativeLayoutCCTV"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"

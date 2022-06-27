@@ -32,6 +32,7 @@
     <color name="colorBlue">#03A9F4</color>
     <color name="blue">#03A9F4</color>
     <color name="blueDark">#006795</color>
+    <color name="disabledButtonColor">#8A8A8A</color>
 
     <color name="colorDelivered">#4CBC8B</color>
     <color name="colorConfirmed">#3DB2FF</color>

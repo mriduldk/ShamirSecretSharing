@@ -1,5 +1,6 @@
 package com.codingstudio.shamirsecretsharing.api
 
+import com.codingstudio.shamirsecretsharing.model.ResponseAdminInfo
 import com.codingstudio.shamirsecretsharing.model.ResponseInsertion
 import com.codingstudio.shamirsecretsharing.model.ResponseKeyGenerated
 import com.codingstudio.shamirsecretsharing.model.ResponseUser
@@ -16,6 +17,23 @@ interface RetrofitAPI {
         view: String = "userInfo",
         @Field("user_name")
         user_name: String,
+        @Field("device_id")
+        device_id: String,
+        @Field("fcm")
+        fcm: String,
+        @Field("type")
+        type: String
+    ): Response<ResponseInsertion>
+
+    @POST("user/UserController.php")
+    @FormUrlEncoded
+    suspend fun getUserInfo2(
+        @Field("view")
+        view: String = "userInfo2",
+        @Field("user_name")
+        user_name: String,
+        @Field("password")
+        password: String,
         @Field("device_id")
         device_id: String,
         @Field("fcm")
@@ -127,6 +145,34 @@ interface RetrofitAPI {
         @Field("hash_keys")
         hash_keys: String
     ): Response<ResponseInsertion>
+
+
+    @POST("user/UserController.php")
+    @FormUrlEncoded
+    suspend fun adminSetUserNo(
+        @Field("view")
+        view: String = "adminSetUserNo",
+        @Field("user_no")
+        user_no: String,
+        @Field("percentage")
+        percentage: String
+    ): Response<ResponseInsertion>
+
+
+    @POST("user/UserController.php")
+    @FormUrlEncoded
+    suspend fun checkAdminInfo(
+        @Field("view")
+        view: String = "checkAdminInfo"
+    ): Response<ResponseAdminInfo>
+
+
+    @POST("user/UserController.php")
+    @FormUrlEncoded
+    suspend fun getAllUser(
+        @Field("view")
+        view: String = "getAllUser"
+    ): Response<ResponseUser>
 
 
 

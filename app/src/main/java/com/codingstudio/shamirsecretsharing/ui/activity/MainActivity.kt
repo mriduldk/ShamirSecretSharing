@@ -70,14 +70,16 @@ class MainActivity : AppCompatActivity() {
 
         textViewUser.setOnClickListener {
 
-            viewModel.getUserInfo(
+            /*viewModel.getUserInfo(
                 user_name = "username",
                 device_id = userUniqueId,
                 fcm = fcmToken ?: "",
                 type = "USER"
             )
 
-            btnClicked = "USER"
+            btnClicked = "USER"*/
+
+            startActivity(Intent(this, LoginActivity::class.java))
 
         }
 
@@ -315,6 +317,19 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        val userType = SharedPref().getStringPref(this, Constant.USER_TYPE)
+
+        if (userType == "ADMIN" ) {
+            startActivity(Intent(this, AdminActivity::class.java))
+
+        } else if (userType == "USER" ) {
+            startActivity(Intent(this, UserActivity::class.java))
+
+        }
+
+    }
 
 
 }

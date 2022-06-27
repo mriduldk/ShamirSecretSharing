@@ -16,6 +16,14 @@ object Constant {
     const val NOT_FOUND = "Not Found"
 
     const val ELOGSHEET = "E-LOGSHEET"
+    const val ADMIN_STATUS = "ADMIN_STATUS"
+    const val ADMIN_STATUS_1 = "ADMIN_STATUS_1"
+    const val ADMIN_STATUS_2 = "ADMIN_STATUS_2"
+
+    const val USER_STATUS = "USER_STATUS"
+    const val USER_STATUS_1 = "USER_STATUS_1"
+    const val USER_STATUS_2 = "USER_STATUS_2"
+    const val USER_STATUS_3 = "USER_STATUS_3"
 
 
     const val STATUS_NO_INTERNET = 503

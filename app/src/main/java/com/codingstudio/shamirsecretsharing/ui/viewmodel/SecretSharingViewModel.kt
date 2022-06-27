@@ -7,10 +7,7 @@ import android.net.NetworkCapabilities
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.codingstudio.shamirsecretsharing.model.Resource
-import com.codingstudio.shamirsecretsharing.model.ResponseInsertion
-import com.codingstudio.shamirsecretsharing.model.ResponseKeyGenerated
-import com.codingstudio.shamirsecretsharing.model.ResponseUser
+import com.codingstudio.shamirsecretsharing.model.*
 import com.codingstudio.shamirsecretsharing.repository.Repository
 import com.codingstudio.shamirsecretsharing.ui.activity.AppApplication
 import com.codingstudio.shamirsecretsharing.utils.Constant
@@ -25,9 +22,12 @@ class SecretSharingViewModel(application: Application) : AndroidViewModel(applic
     private var repository: Repository = Repository()
 
     val userInfo: MutableLiveData<EventWrapper<Resource<ResponseInsertion>>> = MutableLiveData()
+    val userInfo2: MutableLiveData<EventWrapper<Resource<ResponseInsertion>>> = MutableLiveData()
     val userRequest: MutableLiveData<EventWrapper<Resource<ResponseUser>>> = MutableLiveData()
     val userRequestAdmin: MutableLiveData<EventWrapper<Resource<ResponseUser>>> = MutableLiveData()
     val deleteAllData: MutableLiveData<EventWrapper<Resource<ResponseInsertion>>> = MutableLiveData()
+    val adminInfo: MutableLiveData<EventWrapper<Resource<ResponseAdminInfo>>> = MutableLiveData()
+    val getAllUser: MutableLiveData<EventWrapper<Resource<ResponseUser>>> = MutableLiveData()
     val getAllConfirmations: MutableLiveData<EventWrapper<Resource<ResponseKeyGenerated>>> = MutableLiveData()
     val insertUserRequest: MutableLiveData<EventWrapper<Resource<ResponseInsertion>>> = MutableLiveData()
     val updateKeyReuestForUser: MutableLiveData<EventWrapper<Resource<ResponseInsertion>>> = MutableLiveData()
@@ -36,6 +36,7 @@ class SecretSharingViewModel(application: Application) : AndroidViewModel(applic
     val checkUserGeneratedKey: MutableLiveData<EventWrapper<Resource<ResponseKeyGenerated>>> = MutableLiveData()
     val confirmAccess: MutableLiveData<EventWrapper<Resource<ResponseInsertion>>> = MutableLiveData()
     val adminProcessed: MutableLiveData<EventWrapper<Resource<ResponseInsertion>>> = MutableLiveData()
+    val adminUserNo: MutableLiveData<EventWrapper<Resource<ResponseInsertion>>> = MutableLiveData()
 
 
 
@@ -74,6 +75,45 @@ class SecretSharingViewModel(application: Application) : AndroidViewModel(applic
             when (throwable) {
                 is IOException -> userInfo.postValue(EventWrapper(Resource.Error(Constant.NETWORK_FAILURE)))
                 else -> userInfo.postValue(EventWrapper(Resource.Error(Constant.CONVERSION_ERROR)))
+            }
+        }
+    }
+
+    fun getUserInfo2(user_name : String, password : String, device_id : String, fcm : String, type : String) = viewModelScope.launch {
+
+        userInfo2.postValue(EventWrapper(Resource.Loading()))
+        try {
+            if (hasInternetConnection()) {
+                val response = repository.getUserInfo2(user_name = user_name, password = password, device_id = device_id, fcm = fcm, type = type)
+
+                when {
+                    response.code() == Constant.STATUS_SUCCESS -> {
+
+                        userInfo2.postValue(EventWrapper(handleNetworkResponse(response)))
+                    }
+                    response.code() == Constant.STATUS_NOT_FOUND -> {
+
+                        userInfo2.postValue(EventWrapper(Resource.Error(Constant.NOT_FOUND)))
+                    }
+                    response.code() == Constant.STATUS_INTERNAL_ERROR -> {
+
+                        userInfo2.postValue(EventWrapper(Resource.Error(Constant.SERVER_ERROR)))
+                    }
+                    response.code() == Constant.STATUS_CONFLICT -> {
+
+                        userInfo2.postValue(EventWrapper(Resource.Error(Constant.CONFLICT)))
+                    }
+                    else -> {
+                        userInfo2.postValue(EventWrapper(handleNetworkResponse(response)))
+                    }
+                }
+            } else {
+                userInfo2.postValue(EventWrapper(Resource.Error(Constant.NO_INTERNET)))
+            }
+        } catch (throwable: Throwable) {
+            when (throwable) {
+                is IOException -> userInfo2.postValue(EventWrapper(Resource.Error(Constant.NETWORK_FAILURE)))
+                else -> userInfo2.postValue(EventWrapper(Resource.Error(Constant.CONVERSION_ERROR)))
             }
         }
     }
@@ -191,6 +231,84 @@ class SecretSharingViewModel(application: Application) : AndroidViewModel(applic
             when (throwable) {
                 is IOException -> deleteAllData.postValue(EventWrapper(Resource.Error(Constant.NETWORK_FAILURE)))
                 else -> deleteAllData.postValue(EventWrapper(Resource.Error(Constant.CONVERSION_ERROR)))
+            }
+        }
+    }
+
+    fun checkAdminInfo() = viewModelScope.launch {
+
+        adminInfo.postValue(EventWrapper(Resource.Loading()))
+        try {
+            if (hasInternetConnection()) {
+                val response = repository.checkAdminInfo()
+
+                when {
+                    response.code() == Constant.STATUS_SUCCESS -> {
+
+                        adminInfo.postValue(EventWrapper(handleNetworkResponse(response)))
+                    }
+                    response.code() == Constant.STATUS_NOT_FOUND -> {
+
+                        adminInfo.postValue(EventWrapper(Resource.Error(Constant.NOT_FOUND)))
+                    }
+                    response.code() == Constant.STATUS_INTERNAL_ERROR -> {
+
+                        adminInfo.postValue(EventWrapper(Resource.Error(Constant.SERVER_ERROR)))
+                    }
+                    response.code() == Constant.STATUS_CONFLICT -> {
+
+                        adminInfo.postValue(EventWrapper(Resource.Error(Constant.CONFLICT)))
+                    }
+                    else -> {
+                        adminInfo.postValue(EventWrapper(handleNetworkResponse(response)))
+                    }
+                }
+            } else {
+                adminInfo.postValue(EventWrapper(Resource.Error(Constant.NO_INTERNET)))
+            }
+        } catch (throwable: Throwable) {
+            when (throwable) {
+                is IOException -> adminInfo.postValue(EventWrapper(Resource.Error(Constant.NETWORK_FAILURE)))
+                else -> adminInfo.postValue(EventWrapper(Resource.Error(Constant.CONVERSION_ERROR)))
+            }
+        }
+    }
+
+    fun getAllUser() = viewModelScope.launch {
+
+        getAllUser.postValue(EventWrapper(Resource.Loading()))
+        try {
+            if (hasInternetConnection()) {
+                val response = repository.getAllUser()
+
+                when {
+                    response.code() == Constant.STATUS_SUCCESS -> {
+
+                        getAllUser.postValue(EventWrapper(handleNetworkResponse(response)))
+                    }
+                    response.code() == Constant.STATUS_NOT_FOUND -> {
+
+                        getAllUser.postValue(EventWrapper(Resource.Error(Constant.NOT_FOUND)))
+                    }
+                    response.code() == Constant.STATUS_INTERNAL_ERROR -> {
+
+                        getAllUser.postValue(EventWrapper(Resource.Error(Constant.SERVER_ERROR)))
+                    }
+                    response.code() == Constant.STATUS_CONFLICT -> {
+
+                        getAllUser.postValue(EventWrapper(Resource.Error(Constant.CONFLICT)))
+                    }
+                    else -> {
+                        getAllUser.postValue(EventWrapper(handleNetworkResponse(response)))
+                    }
+                }
+            } else {
+                getAllUser.postValue(EventWrapper(Resource.Error(Constant.NO_INTERNET)))
+            }
+        } catch (throwable: Throwable) {
+            when (throwable) {
+                is IOException -> getAllUser.postValue(EventWrapper(Resource.Error(Constant.NETWORK_FAILURE)))
+                else -> getAllUser.postValue(EventWrapper(Resource.Error(Constant.CONVERSION_ERROR)))
             }
         }
     }
@@ -503,6 +621,45 @@ class SecretSharingViewModel(application: Application) : AndroidViewModel(applic
             when (throwable) {
                 is IOException -> adminProcessed.postValue(EventWrapper(Resource.Error(Constant.NETWORK_FAILURE)))
                 else -> adminProcessed.postValue(EventWrapper(Resource.Error(Constant.CONVERSION_ERROR)))
+            }
+        }
+    }
+
+    fun adminSetUserNo(user_no : String, percentage : String) = viewModelScope.launch {
+
+        adminUserNo.postValue(EventWrapper(Resource.Loading()))
+        try {
+            if (hasInternetConnection()) {
+                val response = repository.adminSetUserNo(user_no = user_no, percentage = percentage)
+
+                when {
+                    response.code() == Constant.STATUS_SUCCESS -> {
+
+                        adminUserNo.postValue(EventWrapper(handleNetworkResponse(response)))
+                    }
+                    response.code() == Constant.STATUS_NOT_FOUND -> {
+
+                        adminUserNo.postValue(EventWrapper(Resource.Error(Constant.NOT_FOUND)))
+                    }
+                    response.code() == Constant.STATUS_INTERNAL_ERROR -> {
+
+                        adminUserNo.postValue(EventWrapper(Resource.Error(Constant.SERVER_ERROR)))
+                    }
+                    response.code() == Constant.STATUS_CONFLICT -> {
+
+                        adminUserNo.postValue(EventWrapper(Resource.Error(Constant.CONFLICT)))
+                    }
+                    else -> {
+                        adminUserNo.postValue(EventWrapper(handleNetworkResponse(response)))
+                    }
+                }
+            } else {
+                adminUserNo.postValue(EventWrapper(Resource.Error(Constant.NO_INTERNET)))
+            }
+        } catch (throwable: Throwable) {
+            when (throwable) {
+                is IOException -> adminUserNo.postValue(EventWrapper(Resource.Error(Constant.NETWORK_FAILURE)))
+                else -> adminUserNo.postValue(EventWrapper(Resource.Error(Constant.CONVERSION_ERROR)))
             }
         }
     }
