@@ -6,7 +6,7 @@
     android:layout_gravity="center"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".ui.activity.SensorActivity">
+    tools:context=".SensorActivity">
 
     <Button
         android:id="@+id/btnOn"
@@ -22,32 +22,31 @@
         android:layout_height="wrap_content"
         android:layout_marginVertical="30dp"
         android:orientation="horizontal"
-        tools:context=".ui.activity.SensorActivity">
+        tools:context=".SensorActivity">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Temperature : "
-            android:textStyle="bold"
             android:textSize="18sp"
-            />
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/textViewTemperature"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
+            android:text="0"
             android:textSize="18sp"
-            android:text="0" />
+            android:textStyle="bold" />
 
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:textSize="18sp"
             android:layout_marginHorizontal="2dp"
-            android:text="@string/degree" />
+            android:text="@string/degree"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 

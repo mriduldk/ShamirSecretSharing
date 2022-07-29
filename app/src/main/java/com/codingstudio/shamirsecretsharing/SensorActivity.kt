@@ -1,21 +1,11 @@
-package com.codingstudio.shamirsecretsharing.ui.activity
+package com.codingstudio.shamirsecretsharing
 
-import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
-import android.view.View
 import android.widget.Toast
-import androidx.core.content.ContextCompat
-import com.codingstudio.shamirsecretsharing.R
-import com.codingstudio.shamirsecretsharing.model.Resource
 import com.codingstudio.shamirsecretsharing.ui.activity.mqtt.MQTTClient
-import com.codingstudio.shamirsecretsharing.ui.viewmodel.SecretSharingViewModel
-import com.codingstudio.shamirsecretsharing.utils.Constant
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_sensor.*
-import kotlinx.android.synthetic.main.activity_user3.*
 import org.eclipse.paho.client.mqttv3.*
 
 class SensorActivity : AppCompatActivity() {
@@ -41,6 +31,9 @@ class SensorActivity : AppCompatActivity() {
             publishMessage("Off")
         }
 
+        btnOff.setOnClickListener {
+
+        }
 
         mqttConnection()
 
