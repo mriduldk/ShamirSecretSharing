@@ -55,9 +55,9 @@
                 android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:listitem="@layout/layout_user_list"
+                android:orientation="vertical"
                 tools:itemCount="3"
-                android:orientation="vertical"/>
+                tools:listitem="@layout/layout_user_list" />
 
             <!--<LinearLayout
                 android:id="@+id/linearLayoutUser1"
@@ -309,10 +309,10 @@
                     android:layout_marginHorizontal="16dp"
                     android:gravity="center"
                     android:paddingVertical="16dp"
+                    android:text="1.0"
                     android:textColor="@color/textColor"
                     android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:text="1.0" />
+                    android:textStyle="bold" />
 
                 <ImageView
                     android:id="@+id/textViewAddIntensity"
@@ -330,8 +330,8 @@
                 android:id="@+id/linearLayoutTemperature"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:gravity="center"
+                android:orientation="horizontal"
                 android:visibility="gone">
 
                 <TextView
@@ -340,11 +340,11 @@
                     android:layout_marginHorizontal="16dp"
                     android:gravity="center"
                     android:paddingVertical="16dp"
+                    android:text="Temperature &amp; Humidity : "
                     android:textColor="@color/textColor"
                     android:textSize="22sp"
                     android:textStyle="bold"
-                    android:text="Temperature &amp; Humidity : "
-                    android:visibility="gone"/>
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/textViewTemperature"
